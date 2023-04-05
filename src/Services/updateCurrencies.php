@@ -11,7 +11,6 @@ use Psr\Log\LoggerInterface;
 class updateCurrencies
 {      
 
-    private bool $failure = false;
     /**
      * @param $currencies two-dimensional array with currencies
      *        second lv structure: 
@@ -48,7 +47,7 @@ class updateCurrencies
             {
                 $this->logger->info('Istnieje w DB: '. $row['currency']);
                 $update = $this->update($row);
-                $update ?  $this->logger->info('Zaktualizowano kurs: '. $row['currency']) :  $this->logger->info('Nie aktualizowano kursu: '. $row['currency']);
+                $update ? $this->logger->info('Zaktualizowano kurs: '. $row['currency']) :  $this->logger->info('Nie aktualizowano kursu: '. $row['currency']);
             }
         }
 
@@ -108,6 +107,12 @@ class updateCurrencies
         return $bool = $this->isInDatebase($data['code']);
     }
 
+    /**
+     * Get currency form database by unique code 
+     *
+     * @param string $code - string(3)
+     * @return Currency
+     */
     private function getCurrencyByCode(string $code) : Currency 
     {
         return $this->manager->getRepository(Currency::class)->findOneBy(['currency_code' => $code]);
