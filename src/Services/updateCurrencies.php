@@ -25,7 +25,7 @@ class updateCurrencies
     }
 
 
-    public function doThinks() 
+    public function saveToDB() 
     {   
         
         foreach ($this->currencies as $row)
@@ -34,9 +34,13 @@ class updateCurrencies
 
             if(!$exist)
             {
-                $this->logger->info('Nie istnieje w DB: '. $row["code"]);
+                $this->logger->info('Nie istnieje w DB: '. $row['currency']);
+                $added = $this->addToDB($row);
+                $added ? $this->logger->info('Pomyślnie dodano do Bazy damych '.$row['currency']) : $this->logger->error('Błąd poczas dodawania '.$row['currency']);
+           
             }else
             {
+
                 $this->logger->info('Istnieje w DB: '. $row["code"]);
             }
         }
@@ -45,21 +49,36 @@ class updateCurrencies
        
     }
 
-    public function update($row)
+    private function update($row)
     {
         // ...
     }
 
 
-    public function isInDatebase(string $code)
+    private function isInDatebase(string $code)
     {   
         $exist = $this->manager->getRepository(Currency::class)->findOneBy(['currency_code' => $code]);
         return  isset($exist) ;
     }
 
+    /**
+     * Add currency to DB
+     *
+     * @param array $data contains one from currency from public methode saveToDB()
+     * @return bool 
+     */
     private function addToDB(array $data) 
     {
-         // ...
+        $currency = new Currency();
+        $currency->setName($data['currency']);
+        $currency->setCurrencyCode($data['code']);
+        $currency->setExchangeRate($data['mid']);
+        
+        $this->manager->persist($currency);
+        
+        $this->manager->flush();
+        
+        return $bool = $this->isInDatebase($data['code']);
     }
   
 } 
