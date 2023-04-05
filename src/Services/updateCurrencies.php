@@ -9,7 +9,9 @@ use Psr\Log\LoggerInterface;
 
 
 class updateCurrencies
-{   
+{      
+
+    private bool $failure = false;
     /**
      * @param $currencies two-dimensional array with currencies
      *        second lv structure: 
@@ -24,7 +26,11 @@ class updateCurrencies
     ) {
     }
 
-
+    /**
+     * Main methode. Contains logic to save or update currency and all log.
+     *
+     * @return void
+     */
     public function saveToDB() 
     {   
         
@@ -40,34 +46,55 @@ class updateCurrencies
            
             }else
             {
-
-                $this->logger->info('Istnieje w DB: '. $row["code"]);
+                $this->logger->info('Istnieje w DB: '. $row['currency']);
+                $update = $this->update($row);
+                $update ?  $this->logger->info('Zaktualizowano kurs: '. $row['currency']) :  $this->logger->info('Nie aktualizowano kursu: '. $row['currency']);
             }
         }
 
-        return true;
        
     }
 
-    private function update($row)
+    /**
+     * Update in database exchance_rate 
+     *
+     * @param array $row  one from currency from public methode saveToDB()
+     * @return bool
+     */
+    private function update($row) : bool 
     {
-        // ...
+        $currency = $this->getCurrencyByCode($row['code']);
+
+        if($currency)
+        {
+            $currency->setExchangeRate($row['mid']);
+            $this->manager->flush();
+        }
+
+        $currency = $this->getCurrencyByCode($row['code']);
+
+        return $currency->getExchangeRate() == $row['mid'] ? true : false;
     }
 
-
-    private function isInDatebase(string $code)
+    /**
+     * Check if currency exist base od unique currency_code 
+     *
+     * @param string $code - string(3) 
+     * @return bool
+     */
+    private function isInDatebase(string $code) : bool
     {   
-        $exist = $this->manager->getRepository(Currency::class)->findOneBy(['currency_code' => $code]);
+        $exist = $this->getCurrencyByCode($code);
         return  isset($exist) ;
     }
 
     /**
      * Add currency to DB
      *
-     * @param array $data contains one from currency from public methode saveToDB()
+     * @param array $data one from currency from public methode saveToDB()
      * @return bool 
      */
-    private function addToDB(array $data) 
+    private function addToDB(array $data) : bool
     {
         $currency = new Currency();
         $currency->setName($data['currency']);
@@ -80,5 +107,9 @@ class updateCurrencies
         
         return $bool = $this->isInDatebase($data['code']);
     }
-  
+
+    private function getCurrencyByCode(string $code) : Currency 
+    {
+        return $this->manager->getRepository(Currency::class)->findOneBy(['currency_code' => $code]);
+    }
 } 
