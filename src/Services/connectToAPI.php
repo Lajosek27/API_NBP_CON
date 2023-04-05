@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use Symfony\Contracts\HttpClient\HttpClientInterface;
-use App\Services\connectToAPI;
+
 
 class connectToAPI
 {   
@@ -15,8 +15,17 @@ class connectToAPI
 
     public function getCurrencies() 
     {   
-        
-       
-       
+        $response = $this->client->request(
+            'GET',
+            $_ENV['NBP_API_URL'],
+            [ 'headers' => [
+                'Accept' => 'application/json',
+            ],]
+        );
+
+        $content = $response->toArray();
+
+
+        return  $content[0]['rates'];
     }
 }
