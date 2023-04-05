@@ -13,7 +13,8 @@ class connectToAPI
     ) {
     }
 
-    public function getCurrencies() 
+
+    public function getCurrencies() : array
     {   
         $response = $this->client->request(
             'GET',
