@@ -24,8 +24,7 @@ class UpdateCurrenciesController extends AbstractController
             $logger
         );
         $res = $updater->saveToDB(); 
-        return $this->render('update_currencies/index.html.twig', [
-            'res' =>  $res,
-        ]);
+        
+        return $this->render('update_currencies/index.html.twig');
     }
 }
