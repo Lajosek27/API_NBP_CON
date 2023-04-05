@@ -5,6 +5,8 @@ namespace App\Services;
 
 use App\Entity\Currency;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Log\LoggerInterface;
+
 
 class updateCurrencies
 {   
@@ -17,7 +19,8 @@ class updateCurrencies
      */
     public function __construct(
         private array $currencies,
-        private EntityManagerInterface $manager
+        private EntityManagerInterface $manager,
+        private LoggerInterface $logger
     ) {
     }
 
@@ -28,9 +31,17 @@ class updateCurrencies
         foreach ($this->currencies as $row)
         {
             $exist = $this->isInDatebase($row["code"]);
+
+            if(!$exist)
+            {
+                $this->logger->info('Nie istnieje w DB: '. $row["code"]);
+            }else
+            {
+                $this->logger->info('Istnieje w DB: '. $row["code"]);
+            }
         }
 
-        return $exist;
+        return true;
        
     }
 
