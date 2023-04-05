@@ -17,7 +17,7 @@ class UpdateCurrenciesController extends AbstractController
 
 
         return $this->render('update_currencies/index.html.twig', [
-            'controller_name' => 'UpdateCurrenciesController',
+            'res' =>  $res,
         ]);
     }
 }
