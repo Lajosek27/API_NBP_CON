@@ -72,7 +72,7 @@ class updateCurrencies
 
         $currency = $this->getCurrencyByCode($row['code']);
 
-        return $currency->getExchangeRate() == $row['mid'] ? true : false;
+        return $currency->getExchangeRate() != $row['mid'] ? true : false;
     }
 
     /**
